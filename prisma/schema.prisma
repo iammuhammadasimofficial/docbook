@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id                String   @id @default(cuid())
+  email             String?  @unique
+  phone             String?  @unique
+  name              String?
+  role              String   @default("PATIENT") // PATIENT, DOCTOR
+  preferredLanguage String   @default("en")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  doctorProfile DoctorProfile?
+  appointments  Appointment[]  @relation("PatientAppointments")
+}
+
+model DoctorProfile {
+  id                         String   @id @default(cuid())
+  userId                     String   @unique
+  user                       User     @relation(fields: [userId], references: [id])
+  specialization             String
+  clinicName                 String?
+  clinicAddress              String?
+  city                       String?
+  bio                        String?
+  yearsOfExperience          Int      @default(0)
+  feeOnline                  Float    @default(0)
+  feeInClinic                Float    @default(0)
+  supportsOnline             Boolean  @default(false)
+  supportsInClinic           Boolean  @default(false)
+  appointmentDurationMinutes Int      @default(30)
+  isApproved                 Boolean  @default(false)
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+
+  availability DoctorAvailability[]
+  appointments Appointment[]        @relation("DoctorAppointments")
+}
+
+model DoctorAvailability {
+  id        String        @id @default(cuid())
+  doctorId  String
+  doctor    DoctorProfile @relation(fields: [doctorId], references: [id])
+  dayOfWeek Int // 0-6
+  startTime String // HH:mm
+  endTime   String // HH:mm
+  isOnline  Boolean       @default(false)
+  isInClinic Boolean      @default(false)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model Appointment {
+  id             String        @id @default(cuid())
+  patientId      String
+  patient        User          @relation("PatientAppointments", fields: [patientId], references: [id])
+  doctorId       String
+  doctor         DoctorProfile @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  type           String // ONLINE, IN_CLINIC
+  date           DateTime
+  startTime      String // HH:mm
+  endTime        String // HH:mm
+  status         String        @default("PENDING") // PENDING, CONFIRMED, CANCELLED, COMPLETED
+  paymentMethod  String // CASH, STRIPE
+  paymentStatus  String        @default("PENDING") // PENDING, PAID, REFUNDED
+  notes          String?
+  
+  // Patient Info for this specific appointment
+  patientName        String?
+  patientAge         Int?
+  patientGender      String?
+  illnessDescription String?
+  medicalHistory     String?
+
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
