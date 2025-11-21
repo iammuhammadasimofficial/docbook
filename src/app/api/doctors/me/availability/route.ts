@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/database/client";
 import { z } from "zod";
 
 const availabilitySchema = z.object({
