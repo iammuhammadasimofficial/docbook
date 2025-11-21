@@ -7,6 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "format": "prettier --write .",
+    "lint:fix": "eslint . --fix",
+    "type-check": "tsc --noEmit",
+    "lint-code": "npm run format && npm run lint:fix && npm run type-check",
     "db:dev": "cross-env DATABASE_URL=file:./dev.db npx prisma migrate dev --config=src/database/prisma.config.ts",
     "db:push-turso": "node src/database/scripts/migrate-turso.js",
     "db:seed": "node src/database/scripts/seed.js"
@@ -41,6 +45,8 @@
     "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.7.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
